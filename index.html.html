@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a6b3c">
+<meta name="description" content="FoodBridge - Connect surplus food with people who need it">
+<title>FoodBridge – Reduce Food Waste</title>
+<link rel="manifest" href="#" />
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Lora:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #1a6b3c;
+    --green-mid: #22854b;
+    --green-light: #34a85a;
+    --lime: #7ec84a;
+    --lime-light: #b5e27a;
+    --cream: #f9f5ee;
+    --orange: #f97316;
+    --orange-light: #fed7aa;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --text: #1c2b1e;
+    --text-mid: #4b6b54;
+    --text-muted: #8aab92;
+    --white: #ffffff;
+    --card-bg: #ffffff;
+    --border: #e2ede6;
+    --shadow: 0 4px 24px rgba(26,107,60,0.10);
+    --shadow-lg: 0 8px 40px rgba(26,107,60,0.16);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── SCREENS ─── */
+  .screen { display: none; min-height: 100vh; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ─── SPLASH ─── */
+  #splash {
+    background: linear-gradient(160deg, var(--green) 0%, var(--green-light) 60%, var(--lime) 100%);
+    align-items: center; justify-content: center;
+    text-align: center; padding: 2rem;
+    position: relative; overflow: hidden;
+  }
+  #splash::before {
+    content: '';
+    position: absolute; width: 400px; height: 400px;
+    background: rgba(255,255,255,0.06); border-radius: 50%;
+    top: -100px; right: -100px;
+  }
+  #splash::after {
+    content: '';
+    position: absolute; width: 300px; height: 300px;
+    background: rgba(255,255,255,0.05); border-radius: 50%;
+    bottom: -80px; left: -80px;
+  }
+  .splash-icon { font-size: 5rem; margin-bottom: 1.2rem; animation: bounce 2s infinite; }
+  .splash-title {
+    font-family: 'Lora', serif;
+    font-size: 3rem; color: white; font-weight: 600; margin-bottom: 0.5rem;
+  }
+  .splash-sub { color: rgba(255,255,255,0.85); font-size: 1.05rem; margin-bottom: 3rem; }
+  .splash-btn {
+    background: white; color: var(--green);
+    padding: 1rem 2.5rem; border-radius: 50px;
+    font-size: 1.05rem; font-weight: 800; border: none;
+    cursor: pointer; box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: 'Nunito', sans-serif;
+  }
+  .splash-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.25); }
+  .splash-stats {
+    display: flex; gap: 2rem; margin-top: 3rem; justify-content: center;
+  }
+  .splash-stat { color: white; text-align: center; }
+  .splash-stat-num { font-size: 1.6rem; font-weight: 900; }
+  .splash-stat-label { font-size: 0.75rem; opacity: 0.8; }
+
+  /* ─── AUTH ─── */
+  #auth {
+    background: var(--cream);
+    align-items: center; justify-content: center; padding: 2rem;
+  }
+  .auth-card {
+    background: white; border-radius: 24px;
+    padding: 2.5rem 2rem; width: 100%; max-width: 400px;
+    box-shadow: var(--shadow-lg);
+  }
+  .auth-logo { text-align: center; margin-bottom: 2rem; }
+  .auth-logo-icon { font-size: 2.5rem; }
+  .auth-logo-text {
+    font-family: 'Lora', serif;
+    font-size: 1.6rem; color: var(--green); font-weight: 600;
+  }
+  .auth-tabs {
+    display: flex; background: var(--border);
+    border-radius: 12px; padding: 4px; margin-bottom: 1.8rem;
+  }
+  .auth-tab {
+    flex: 1; padding: 0.6rem; border-radius: 10px; border: none;
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.9rem;
+    cursor: pointer; background: transparent; color: var(--text-muted);
+    transition: all 0.2s;
+  }
+  .auth-tab.active { background: white; color: var(--green); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .form-group { margin-bottom: 1rem; }
+  .form-label { font-size: 0.82rem; font-weight: 700; color: var(--text-mid); margin-bottom: 0.4rem; display: block; letter-spacing: 0.5px; }
+  .form-input {
+    width: 100%; padding: 0.85rem 1rem;
+    border: 2px solid var(--border); border-radius: 12px;
+    font-family: 'Nunito', sans-serif; font-size: 0.95rem; color: var(--text);
+    background: var(--cream); outline: none; transition: border-color 0.2s;
+  }
+  .form-input:focus { border-color: var(--green-light); background: white; }
+  .role-select {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; margin-bottom: 1.2rem;
+  }
+  .role-btn {
+    padding: 0.7rem 0.4rem; border: 2px solid var(--border); border-radius: 12px;
+    background: white; cursor: pointer; text-align: center;
+    transition: all 0.2s; font-family: 'Nunito', sans-serif;
+  }
+  .role-btn.active { border-color: var(--green); background: rgba(26,107,60,0.06); }
+  .role-btn-icon { font-size: 1.4rem; display: block; margin-bottom: 0.3rem; }
+  .role-btn-label { font-size: 0.72rem; font-weight: 700; color: var(--text-mid); }
+  .btn-primary {
+    width: 100%; padding: 1rem; border-radius: 50px;
+    background: linear-gradient(135deg, var(--green), var(--green-light));
+    color: white; border: none; font-family: 'Nunito', sans-serif;
+    font-size: 1rem; font-weight: 800; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(26,107,60,0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(26,107,60,0.4); }
+
+  /* ─── MAIN APP ─── */
+  #app { background: var(--cream); }
+
+  /* Top Bar */
+  .topbar {
+    background: white; padding: 1rem 1.2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06); position: sticky; top: 0; z-index: 50;
+  }
+  .topbar-logo { font-family: 'Lora', serif; font-size: 1.3rem; color: var(--green); font-weight: 600; }
+  .topbar-logo span { font-size: 1.3rem; }
+  .topbar-right { display: flex; align-items: center; gap: 0.8rem; }
+  .topbar-notif {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--cream); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; position: relative;
+  }
+  .notif-badge {
+    position: absolute; top: 4px; right: 4px;
+    width: 10px; height: 10px; background: var(--orange);
+    border-radius: 50%; border: 2px solid white;
+  }
+  .topbar-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--green), var(--lime));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; cursor: pointer; font-weight: 800; color: white;
+  }
+
+  /* Tab Content */
+  .tab-content { display: none; flex: 1; overflow-y: auto; padding-bottom: 5rem; }
+  .tab-content.active { display: block; }
+
+  /* ─── HOME TAB ─── */
+  .home-hero {
+    background: linear-gradient(135deg, var(--green) 0%, var(--green-light) 100%);
+    padding: 1.5rem 1.2rem 2.5rem; position: relative; overflow: hidden;
+  }
+  .home-hero::after {
+    content: '🌿';
+    position: absolute; right: -10px; bottom: -15px;
+    font-size: 7rem; opacity: 0.15; transform: rotate(-20deg);
+  }
+  .home-greeting { color: rgba(255,255,255,0.85); font-size: 0.9rem; margin-bottom: 0.3rem; }
+  .home-name { color: white; font-size: 1.5rem; font-weight: 800; margin-bottom: 1rem; }
+  .impact-card {
+    background: rgba(255,255,255,0.15); border-radius: 16px;
+    padding: 1rem 1.2rem; backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .impact-icon { font-size: 2rem; }
+  .impact-text { color: white; }
+  .impact-num { font-size: 1.5rem; font-weight: 900; }
+  .impact-label { font-size: 0.78rem; opacity: 0.85; }
+
+  .section-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.2rem 1.2rem 0.6rem;
+  }
+  .section-title { font-size: 1rem; font-weight: 800; color: var(--text); }
+  .section-link { font-size: 0.82rem; color: var(--green); font-weight: 700; cursor: pointer; }
+
+  /* Stats row */
+  .stats-row {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem;
+    padding: 0 1.2rem 0.5rem;
+  }
+  .stat-card {
+    background: white; border-radius: 16px; padding: 1rem 0.8rem;
+    text-align: center; box-shadow: var(--shadow);
+  }
+  .stat-card-icon { font-size: 1.5rem; margin-bottom: 0.3rem; }
+  .stat-card-num { font-size: 1.2rem; font-weight: 900; color: var(--green); }
+  .stat-card-label { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
+
+  /* Food Cards */
+  .food-cards { padding: 0 1.2rem; display: flex; flex-direction: column; gap: 0.9rem; }
+  .food-card {
+    background: white; border-radius: 20px; overflow: hidden;
+    box-shadow: var(--shadow); transition: transform 0.2s;
+    display: flex; gap: 0;
+  }
+  .food-card:active { transform: scale(0.98); }
+  .food-card-thumb {
+    width: 100px; min-height: 100px;
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.5rem; flex-shrink: 0;
+  }
+  .food-card-body { padding: 0.9rem 1rem; flex: 1; }
+  .food-card-tags { display: flex; gap: 0.4rem; margin-bottom: 0.4rem; flex-wrap: wrap; }
+  .food-tag {
+    font-size: 0.67rem; font-weight: 700; padding: 0.2rem 0.5rem;
+    border-radius: 20px; letter-spacing: 0.3px;
+  }
+  .tag-veg { background: #dcfce7; color: #16a34a; }
+  .tag-nonveg { background: #fee2e2; color: #dc2626; }
+  .tag-urgent { background: #fff7ed; color: #ea580c; }
+  .tag-free { background: #f0fdf4; color: #15803d; }
+  .food-card-title { font-size: 0.95rem; font-weight: 800; color: var(--text); margin-bottom: 0.2rem; }
+  .food-card-meta { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+  .food-card-footer { display: flex; align-items: center; justify-content: space-between; }
+  .food-card-time { font-size: 0.75rem; color: var(--orange); font-weight: 700; }
+  .claim-btn {
+    background: var(--green); color: white;
+    padding: 0.35rem 0.9rem; border-radius: 20px; border: none;
+    font-family: 'Nunito', sans-serif; font-size: 0.78rem; font-weight: 700;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .claim-btn:hover { background: var(--green-mid); }
+  .claim-btn.claimed { background: var(--text-muted); cursor: default; }
+
+  /* ─── MAP TAB ─── */
+  .map-container {
+    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+    margin: 1rem; border-radius: 20px; height: 260px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden; box-shadow: var(--shadow);
+  }
+  .map-placeholder { text-align: center; }
+  .map-placeholder-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+  .map-placeholder-text { color: var(--green); font-weight: 700; font-size: 0.9rem; }
+  .map-placeholder-sub { color: var(--text-muted); font-size: 0.8rem; }
+  .map-pins {
+    position: absolute; inset: 0;
+  }
+  .map-pin {
+    position: absolute;
+    animation: pinPop 0.5s ease both;
+    cursor: pointer;
+  }
+  .map-pin-icon { font-size: 1.8rem; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.2)); }
+  .map-legend {
+    display: flex; gap: 1rem; padding: 0 1rem 0.5rem; flex-wrap: wrap;
+  }
+  .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--text-mid); font-weight: 600; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* ─── DONATE TAB ─── */
+  .donate-form { padding: 1.2rem; }
+  .donate-form h2 { font-size: 1.2rem; font-weight: 800; margin-bottom: 0.3rem; }
+  .donate-form p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+  .food-emoji-pick {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; margin-bottom: 1rem;
+  }
+  .emoji-btn {
+    aspect-ratio: 1; border: 2px solid var(--border); border-radius: 12px;
+    background: white; font-size: 1.4rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .emoji-btn.active { border-color: var(--green); background: rgba(26,107,60,0.06); transform: scale(1.1); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+  .urgency-btns { display: flex; gap: 0.6rem; }
+  .urgency-btn {
+    flex: 1; padding: 0.6rem; border-radius: 10px; border: 2px solid var(--border);
+    background: white; font-family: 'Nunito', sans-serif; font-size: 0.8rem; font-weight: 700;
+    cursor: pointer; text-align: center; transition: all 0.2s; color: var(--text-mid);
+  }
+  .urgency-btn.active { border-color: var(--orange); background: #fff7ed; color: var(--orange); }
+  .submit-btn {
+    width: 100%; padding: 1rem; border-radius: 50px; margin-top: 1.5rem;
+    background: linear-gradient(135deg, var(--green), var(--lime));
+    color: white; border: none; font-family: 'Nunito', sans-serif;
+    font-size: 1rem; font-weight: 800; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(26,107,60,0.3); transition: transform 0.2s;
+  }
+  .submit-btn:hover { transform: translateY(-2px); }
+
+  /* ─── HISTORY TAB ─── */
+  .history-list { padding: 1rem; display: flex; flex-direction: column; gap: 0.8rem; }
+  .history-item {
+    background: white; border-radius: 16px; padding: 1rem 1.2rem;
+    display: flex; align-items: center; gap: 1rem; box-shadow: var(--shadow);
+  }
+  .history-icon { font-size: 2rem; }
+  .history-body { flex: 1; }
+  .history-title { font-size: 0.92rem; font-weight: 700; color: var(--text); }
+  .history-meta { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem; }
+  .history-badge {
+    font-size: 0.72rem; font-weight: 700; padding: 0.3rem 0.7rem;
+    border-radius: 20px;
+  }
+  .badge-donated { background: #dcfce7; color: #16a34a; }
+  .badge-claimed { background: #dbeafe; color: #1d4ed8; }
+  .badge-expired { background: #fee2e2; color: #dc2626; }
+
+  /* ─── PROFILE TAB ─── */
+  .profile-header {
+    background: linear-gradient(135deg, var(--green), var(--green-light));
+    padding: 2rem 1.2rem; text-align: center;
+  }
+  .profile-avatar-big {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: rgba(255,255,255,0.2); border: 3px solid rgba(255,255,255,0.5);
+    margin: 0 auto 0.8rem; display: flex; align-items: center;
+    justify-content: center; font-size: 2.2rem; color: white; font-weight: 900;
+  }
+  .profile-name { color: white; font-size: 1.2rem; font-weight: 800; }
+  .profile-role { color: rgba(255,255,255,0.8); font-size: 0.85rem; margin-top: 0.2rem; }
+  .profile-impact-row {
+    display: grid; grid-template-columns: repeat(3,1fr);
+    gap: 0; background: white; margin: 0 1rem;
+    border-radius: 16px; overflow: hidden; box-shadow: var(--shadow);
+    margin-top: -1.5rem; position: relative;
+  }
+  .profile-impact-item {
+    padding: 1rem 0.5rem; text-align: center;
+    border-right: 1px solid var(--border);
+  }
+  .profile-impact-item:last-child { border-right: none; }
+  .profile-impact-num { font-size: 1.3rem; font-weight: 900; color: var(--green); }
+  .profile-impact-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; }
+  .profile-menu { padding: 1.2rem; margin-top: 0.5rem; }
+  .profile-menu-item {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1rem; background: white; border-radius: 14px;
+    margin-bottom: 0.6rem; box-shadow: var(--shadow); cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .profile-menu-item:active { transform: scale(0.98); }
+  .menu-icon { font-size: 1.3rem; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .menu-icon.green { background: #dcfce7; }
+  .menu-icon.blue { background: #dbeafe; }
+  .menu-icon.orange { background: #fff7ed; }
+  .menu-icon.red { background: #fee2e2; }
+  .menu-label { flex: 1; font-size: 0.93rem; font-weight: 700; color: var(--text); }
+  .menu-arrow { color: var(--text-muted); font-size: 0.9rem; }
+
+  /* ─── BOTTOM NAV ─── */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: white; padding: 0.6rem 0 0.8rem;
+    display: flex; justify-content: space-around; align-items: center;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08); z-index: 50;
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 0.2rem; cursor: pointer; padding: 0.2rem 1rem;
+    border: none; background: none; font-family: 'Nunito', sans-serif;
+    transition: transform 0.2s;
+  }
+  .nav-item:active { transform: scale(0.92); }
+  .nav-icon { font-size: 1.35rem; }
+  .nav-label { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); }
+  .nav-item.active .nav-label { color: var(--green); }
+  .nav-item.active .nav-icon { filter: none; }
+  .nav-donate-btn {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--green), var(--lime));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; border: none; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(26,107,60,0.4);
+    margin-top: -18px; transition: transform 0.2s;
+  }
+  .nav-donate-btn:active { transform: scale(0.92); }
+
+  /* ─── NOTIFICATIONS PANEL ─── */
+  .notif-panel {
+    position: fixed; top: 0; right: 0; bottom: 0; width: 100%; max-width: 380px;
+    background: white; z-index: 200; transform: translateX(100%);
+    transition: transform 0.3s ease; box-shadow: -8px 0 40px rgba(0,0,0,0.15);
+    display: flex; flex-direction: column;
+  }
+  .notif-panel.open { transform: translateX(0); }
+  .notif-header {
+    padding: 1.2rem; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .notif-header h3 { font-size: 1.1rem; font-weight: 800; }
+  .notif-close { background: none; border: none; font-size: 1.3rem; cursor: pointer; }
+  .notif-list { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.8rem; }
+  .notif-item {
+    display: flex; gap: 0.8rem; padding: 0.9rem;
+    background: var(--cream); border-radius: 14px;
+  }
+  .notif-item-icon { font-size: 1.5rem; }
+  .notif-item-body {}
+  .notif-item-title { font-size: 0.88rem; font-weight: 700; color: var(--text); }
+  .notif-item-time { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; }
+
+  /* ─── SUCCESS TOAST ─── */
+  .toast {
+    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--green); color: white; padding: 0.8rem 1.5rem;
+    border-radius: 50px; font-weight: 700; font-size: 0.9rem;
+    box-shadow: 0 4px 20px rgba(26,107,60,0.4); opacity: 0;
+    transition: all 0.3s; z-index: 300; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+  @keyframes pinPop {
+    from { opacity: 0; transform: scale(0) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: none; }
+  }
+  .food-card { animation: fadeIn 0.4s ease both; }
+  .food-card:nth-child(2) { animation-delay: 0.08s; }
+  .food-card:nth-child(3) { animation-delay: 0.16s; }
+  .food-card:nth-child(4) { animation-delay: 0.24s; }
+
+  /* Overlay */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+    z-index: 150; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .overlay.show { opacity: 1; pointer-events: all; }
+
+  /* Search bar */
+  .search-bar {
+    margin: 1rem 1.2rem 0.5rem;
+    display: flex; align-items: center; gap: 0.6rem;
+    background: white; border-radius: 14px; padding: 0.7rem 1rem;
+    box-shadow: var(--shadow);
+  }
+  .search-icon { font-size: 1rem; color: var(--text-muted); }
+  .search-input {
+    flex: 1; border: none; outline: none;
+    font-family: 'Nunito', sans-serif; font-size: 0.9rem;
+    background: transparent; color: var(--text);
+  }
+  .search-input::placeholder { color: var(--text-muted); }
+
+  /* Filter chips */
+  .filter-chips {
+    display: flex; gap: 0.5rem; padding: 0.5rem 1.2rem;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .filter-chips::-webkit-scrollbar { display: none; }
+  .chip {
+    padding: 0.35rem 0.9rem; border-radius: 20px; border: none;
+    font-family: 'Nunito', sans-serif; font-size: 0.78rem; font-weight: 700;
+    cursor: pointer; white-space: nowrap; transition: all 0.2s;
+    background: white; color: var(--text-muted); box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .chip.active { background: var(--green); color: white; }
+</style>
+</head>
+<body>
+
+<!-- ══════════ SPLASH ══════════ -->
+<div id="splash" class="screen active">
+  <div class="splash-icon">🌱</div>
+  <div class="splash-title">FoodBridge</div>
+  <div class="splash-sub">Connecting surplus food with people who need it</div>
+  <button class="splash-btn" onclick="showScreen('auth')">Get Started →</button>
+  <div class="splash-stats">
+    <div class="splash-stat">
+      <div class="splash-stat-num">2.4K</div>
+      <div class="splash-stat-label">Meals Saved</div>
+    </div>
+    <div class="splash-stat">
+      <div class="splash-stat-num">180+</div>
+      <div class="splash-stat-label">Donors</div>
+    </div>
+    <div class="splash-stat">
+      <div class="splash-stat-num">42</div>
+      <div class="splash-stat-label">NGOs</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ AUTH ══════════ -->
+<div id="auth" class="screen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="auth-logo-icon">🌱</div>
+      <div class="auth-logo-text">FoodBridge</div>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab(this, 'login-form')">Login</button>
+      <button class="auth-tab" onclick="switchTab(this, 'signup-form')">Sign Up</button>
+    </div>
+
+    <!-- Login -->
+    <div id="login-form">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" type="email" placeholder="you@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" placeholder="••••••••">
+      </div>
+      <button class="btn-primary" onclick="enterApp()">Login →</button>
+    </div>
+
+    <!-- Signup -->
+    <div id="signup-form" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input class="form-input" type="text" placeholder="Your name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" type="email" placeholder="you@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">I am a...</label>
+        <div class="role-select">
+          <div class="role-btn active" onclick="selectRole(this)">
+            <span class="role-btn-icon">🏪</span>
+            <span class="role-btn-label">Donor</span>
+          </div>
+          <div class="role-btn" onclick="selectRole(this)">
+            <span class="role-btn-icon">🤝</span>
+            <span class="role-btn-label">NGO</span>
+          </div>
+          <div class="role-btn" onclick="selectRole(this)">
+            <span class="role-btn-icon">👤</span>
+            <span class="role-btn-label">Receiver</span>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" placeholder="Create password">
+      </div>
+      <button class="btn-primary" onclick="enterApp()">Create Account →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MAIN APP ══════════ -->
+<div id="app" class="screen">
+
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-logo">🌱 FoodBridge</div>
+    <div class="topbar-right">
+      <button class="topbar-notif" onclick="toggleNotif()">
+        🔔
+        <div class="notif-badge"></div>
+      </button>
+      <div class="topbar-avatar">A</div>
+    </div>
+  </div>
+
+  <!-- HOME TAB -->
+  <div id="tab-home" class="tab-content active">
+    <div class="home-hero">
+      <div class="home-greeting">Good morning 👋</div>
+      <div class="home-name">Alex Morgan</div>
+      <div class="impact-card">
+        <div class="impact-icon">♻️</div>
+        <div class="impact-text">
+          <div class="impact-num">12 meals</div>
+          <div class="impact-label">saved by you this month</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="section-header">
+      <div class="section-title">Today's Impact</div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-card-icon">🍱</div>
+        <div class="stat-card-num">38</div>
+        <div class="stat-card-label">Available</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">✅</div>
+        <div class="stat-card-num">124</div>
+        <div class="stat-card-label">Claimed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">🏘️</div>
+        <div class="stat-card-num">8km</div>
+        <div class="stat-card-label">Near You</div>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-bar">
+      <div class="search-icon">🔍</div>
+      <input class="search-input" placeholder="Search food near you...">
+    </div>
+
+    <!-- Filter Chips -->
+    <div class="filter-chips">
+      <button class="chip active" onclick="filterChip(this)">All</button>
+      <button class="chip" onclick="filterChip(this)">🥗 Veg</button>
+      <button class="chip" onclick="filterChip(this)">🍗 Non-Veg</button>
+      <button class="chip" onclick="filterChip(this)">⚡ Urgent</button>
+      <button class="chip" onclick="filterChip(this)">🆓 Free</button>
+      <button class="chip" onclick="filterChip(this)">📦 Bulk</button>
+    </div>
+
+    <!-- Food Listings -->
+    <div class="section-header">
+      <div class="section-title">Available Near You</div>
+      <div class="section-link">See all →</div>
+    </div>
+    <div class="food-cards" id="food-list">
+      <div class="food-card">
+        <div class="food-card-thumb">🍛</div>
+        <div class="food-card-body">
+          <div class="food-card-tags">
+            <span class="food-tag tag-veg">Veg</span>
+            <span class="food-tag tag-urgent">⚡ Urgent</span>
+          </div>
+          <div class="food-card-title">Sambar Rice & Papad</div>
+          <div class="food-card-meta">📍 Annamalai Hotel · 1.2km · ~15 portions</div>
+          <div class="food-card-footer">
+            <div class="food-card-time">⏱ 1hr left</div>
+            <button class="claim-btn" onclick="claimFood(this)">Claim</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="food-card">
+        <div class="food-card-thumb">🎂</div>
+        <div class="food-card-body">
+          <div class="food-card-tags">
+            <span class="food-tag tag-veg">Veg</span>
+            <span class="food-tag tag-free">Free</span>
+          </div>
+          <div class="food-card-title">Celebration Cake Slices</div>
+          <div class="food-card-meta">📍 Krishna Bakery · 0.8km · ~8 portions</div>
+          <div class="food-card-footer">
+            <div class="food-card-time">⏱ 3hrs left</div>
+            <button class="claim-btn" onclick="claimFood(this)">Claim</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="food-card">
+        <div class="food-card-thumb">🍗</div>
+        <div class="food-card-body">
+          <div class="food-card-tags">
+            <span class="food-tag tag-nonveg">Non-Veg</span>
+          </div>
+          <div class="food-card-title">Chicken Biryani</div>
+          <div class="food-card-meta">📍 Star Mess · 2.1km · ~20 portions</div>
+          <div class="food-card-footer">
+            <div class="food-card-time">⏱ 2hrs left</div>
+            <button class="claim-btn" onclick="claimFood(this)">Claim</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="food-card">
+        <div class="food-card-thumb">🥙</div>
+        <div class="food-card-body">
+          <div class="food-card-tags">
+            <span class="food-tag tag-veg">Veg</span>
+            <span class="food-tag tag-free">Free</span>
+          </div>
+          <div class="food-card-title">Mixed Veg Meals</div>
+          <div class="food-card-meta">📍 Rani Canteen · 3.4km · ~30 portions</div>
+          <div class="food-card-footer">
+            <div class="food-card-time">⏱ 4hrs left</div>
+            <button class="claim-btn" onclick="claimFood(this)">Claim</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAP TAB -->
+  <div id="tab-map" class="tab-content">
+    <div class="section-header" style="padding-top:1.2rem;">
+      <div class="section-title">Food Map — Near You</div>
+    </div>
+    <div class="map-container">
+      <div class="map-pins">
+        <div class="map-pin" style="top:30%;left:40%;animation-delay:0.1s"><div class="map-pin-icon">📍</div></div>
+        <div class="map-pin" style="top:50%;left:20%;animation-delay:0.2s"><div class="map-pin-icon">🍛</div></div>
+        <div class="map-pin" style="top:60%;left:65%;animation-delay:0.3s"><div class="map-pin-icon">🎂</div></div>
+        <div class="map-pin" style="top:25%;left:70%;animation-delay:0.4s"><div class="map-pin-icon">🍗</div></div>
+        <div class="map-pin" style="top:70%;left:45%;animation-delay:0.5s"><div class="map-pin-icon">🥙</div></div>
+        <div class="map-pin" style="top:40%;left:55%;animation-delay:0s">
+          <div style="background:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2);font-size:1rem;">👤</div>
+        </div>
+      </div>
+    </div>
+    <div class="map-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#16a34a"></div>Veg Food</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#dc2626"></div>Non-Veg</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ea580c"></div>Urgent</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>You</div>
+    </div>
+    <div class="section-header">
+      <div class="section-title">Nearby Listings</div>
+    </div>
+    <div class="food-cards" style="padding-bottom:1rem;">
+      <div class="food-card">
+        <div class="food-card-thumb">🍛</div>
+        <div class="food-card-body">
+          <div class="food-card-tags"><span class="food-tag tag-veg">Veg</span><span class="food-tag tag-urgent">⚡ Urgent</span></div>
+          <div class="food-card-title">Sambar Rice & Papad</div>
+          <div class="food-card-meta">📍 1.2km away</div>
+          <div class="food-card-footer">
+            <div class="food-card-time">⏱ 1hr left</div>
+            <button class="claim-btn" onclick="claimFood(this)">Claim</button>
+          </div>
+        </div>
+      </div>
+      <div class="food-card">
+        <div class="food-card-thumb">🎂</div>
+        <div class="food-card-body">
+          <div class="food-card-tags"><span class="food-tag tag-veg">Veg</span></div>
+          <div class="food-card-title">Celebration Cake Slices</div>
+          <div class="food-card-meta">📍 0.8km away</div>
+          <div class="food-card-footer">
+            <div class="food-card-time">⏱ 3hrs left</div>
+            <button class="claim-btn" onclick="claimFood(this)">Claim</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DONATE TAB -->
+  <div id="tab-donate" class="tab-content">
+    <div class="donate-form">
+      <h2>🍱 Post Surplus Food</h2>
+      <p>Help reduce waste by sharing food with those who need it.</p>
+
+      <div class="form-group">
+        <label class="form-label">Choose Food Type</label>
+        <div class="food-emoji-pick">
+          <button class="emoji-btn active" onclick="selectEmoji(this)">🍛</button>
+          <button class="emoji-btn" onclick="selectEmoji(this)">🍗</button>
+          <button class="emoji-btn" onclick="selectEmoji(this)">🎂</button>
+          <button class="emoji-btn" onclick="selectEmoji(this)">🥗</button>
+          <button class="emoji-btn" onclick="selectEmoji(this)">🍜</button>
+          <button class="emoji-btn" onclick="selectEmoji(this)">🥘</button>
+          <button class="emoji-btn" onclick="selectEmoji(this)">🍞</button>
+          <button class="emoji-btn" onclick="selectEmoji(this)">🥙</button>
+          <button class="emoji-btn" onclick="selectEmoji(this)">🍱</button>
+          <button class="emoji-btn" onclick="selectEmoji(this)">🍰</button>
+          <button class="emoji-btn" onclick="selectEmoji(this)">🥧</button>
+          <button class="emoji-btn" onclick="selectEmoji(this)">🫕</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Food Name</label>
+        <input class="form-input" type="text" placeholder="e.g. Sambar Rice, Chicken Biryani">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Quantity (portions)</label>
+          <input class="form-input" type="number" placeholder="e.g. 20">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Available Until</label>
+          <input class="form-input" type="time" value="20:00">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Pickup Location</label>
+        <input class="form-input" type="text" placeholder="Shop name, area...">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Urgency Level</label>
+        <div class="urgency-btns">
+          <button class="urgency-btn" onclick="selectUrgency(this)">🟢 Normal</button>
+          <button class="urgency-btn active" onclick="selectUrgency(this)">🟡 Soon</button>
+          <button class="urgency-btn" onclick="selectUrgency(this)">🔴 Urgent</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Additional Notes</label>
+        <input class="form-input" type="text" placeholder="Veg/Non-veg, allergy info...">
+      </div>
+
+      <button class="submit-btn" onclick="submitDonation()">🌱 Post Food Donation</button>
+    </div>
+  </div>
+
+  <!-- HISTORY TAB -->
+  <div id="tab-history" class="tab-content">
+    <div class="section-header" style="padding-top:1.2rem;">
+      <div class="section-title">Your Activity</div>
+    </div>
+    <div class="history-list">
+      <div class="history-item">
+        <div class="history-icon">🍛</div>
+        <div class="history-body">
+          <div class="history-title">Sambar Rice — 15 portions</div>
+          <div class="history-meta">Donated · Today, 12:30 PM</div>
+        </div>
+        <div class="history-badge badge-donated">Donated</div>
+      </div>
+      <div class="history-item">
+        <div class="history-icon">🎂</div>
+        <div class="history-body">
+          <div class="history-title">Cake Slices — 8 portions</div>
+          <div class="history-meta">Claimed · Yesterday, 6:15 PM</div>
+        </div>
+        <div class="history-badge badge-claimed">Claimed</div>
+      </div>
+      <div class="history-item">
+        <div class="history-icon">🍗</div>
+        <div class="history-body">
+          <div class="history-title">Chicken Curry — 10 portions</div>
+          <div class="history-meta">Donated · 2 days ago</div>
+        </div>
+        <div class="history-badge badge-donated">Donated</div>
+      </div>
+      <div class="history-item">
+        <div class="history-icon">🥗</div>
+        <div class="history-body">
+          <div class="history-title">Mixed Salad — 5 portions</div>
+          <div class="history-meta">Expired · 3 days ago</div>
+        </div>
+        <div class="history-badge badge-expired">Expired</div>
+      </div>
+      <div class="history-item">
+        <div class="history-icon">🍜</div>
+        <div class="history-body">
+          <div class="history-title">Noodles — 12 portions</div>
+          <div class="history-meta">Claimed · 4 days ago</div>
+        </div>
+        <div class="history-badge badge-claimed">Claimed</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE TAB -->
+  <div id="tab-profile" class="tab-content">
+    <div class="profile-header">
+      <div class="profile-avatar-big">A</div>
+      <div class="profile-name">Alex Morgan</div>
+      <div class="profile-role">🏪 Food Donor · Chennai, TN</div>
+    </div>
+    <div class="profile-impact-row">
+      <div class="profile-impact-item">
+        <div class="profile-impact-num">12</div>
+        <div class="profile-impact-label">Donations</div>
+      </div>
+      <div class="profile-impact-item">
+        <div class="profile-impact-num">148</div>
+        <div class="profile-impact-label">Meals Saved</div>
+      </div>
+      <div class="profile-impact-item">
+        <div class="profile-impact-num">4.9⭐</div>
+        <div class="profile-impact-label">Rating</div>
+      </div>
+    </div>
+    <div class="profile-menu">
+      <div class="profile-menu-item">
+        <div class="menu-icon green">🏆</div>
+        <div class="menu-label">My Achievements</div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="profile-menu-item">
+        <div class="menu-icon blue">📊</div>
+        <div class="menu-label">Impact Report</div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="profile-menu-item">
+        <div class="menu-icon orange">⚙️</div>
+        <div class="menu-label">Settings</div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="profile-menu-item">
+        <div class="menu-icon green">🤝</div>
+        <div class="menu-label">Refer a Friend</div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="profile-menu-item" onclick="showScreen('splash')">
+        <div class="menu-icon red">🚪</div>
+        <div class="menu-label">Logout</div>
+        <div class="menu-arrow">›</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="switchAppTab('home', this)">
+      <div class="nav-icon">🏠</div>
+      <div class="nav-label">Home</div>
+    </button>
+    <button class="nav-item" onclick="switchAppTab('map', this)">
+      <div class="nav-icon">🗺️</div>
+      <div class="nav-label">Map</div>
+    </button>
+    <button class="nav-donate-btn" onclick="switchAppTab('donate', document.querySelector('.nav-item.active'))">
+      ➕
+    </button>
+    <button class="nav-item" onclick="switchAppTab('history', this)">
+      <div class="nav-icon">📋</div>
+      <div class="nav-label">History</div>
+    </button>
+    <button class="nav-item" onclick="switchAppTab('profile', this)">
+      <div class="nav-icon">👤</div>
+      <div class="nav-label">Profile</div>
+    </button>
+  </div>
+</div>
+
+<!-- Notifications Panel -->
+<div class="overlay" id="overlay" onclick="toggleNotif()"></div>
+<div class="notif-panel" id="notif-panel">
+  <div class="notif-header">
+    <h3>🔔 Notifications</h3>
+    <button class="notif-close" onclick="toggleNotif()">✕</button>
+  </div>
+  <div class="notif-list">
+    <div class="notif-item">
+      <div class="notif-item-icon">🍛</div>
+      <div class="notif-item-body">
+        <div class="notif-item-title">New food posted near you! Sambar Rice (15 portions) at Annamalai Hotel.</div>
+        <div class="notif-item-time">2 minutes ago</div>
+      </div>
+    </div>
+    <div class="notif-item">
+      <div class="notif-item-icon">✅</div>
+      <div class="notif-item-body">
+        <div class="notif-item-title">Your donation of Chicken Curry was claimed by Hope NGO.</div>
+        <div class="notif-item-time">1 hour ago</div>
+      </div>
+    </div>
+    <div class="notif-item">
+      <div class="notif-item-icon">⚡</div>
+      <div class="notif-item-body">
+        <div class="notif-item-title">Urgent: 3 listings near you expire in less than 1 hour!</div>
+        <div class="notif-item-time">3 hours ago</div>
+      </div>
+    </div>
+    <div class="notif-item">
+      <div class="notif-item-icon">🏆</div>
+      <div class="notif-item-body">
+        <div class="notif-item-title">You've unlocked the "Food Hero" badge for saving 100+ meals!</div>
+        <div class="notif-item-time">Yesterday</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── Screen navigation ──
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  // ── Auth tab switch ──
+  function switchTab(btn, formId) {
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('login-form').style.display = formId === 'login-form' ? 'block' : 'none';
+    document.getElementById('signup-form').style.display = formId === 'signup-form' ? 'block' : 'none';
+  }
+
+  // ── Role selection ──
+  function selectRole(el) {
+    document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // ── Enter app ──
+  function enterApp() { showScreen('app'); }
+
+  // ── App tab navigation ──
+  function switchAppTab(tab, navItem) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    if (navItem && navItem.classList) navItem.classList.add('active');
+  }
+
+  // ── Notifications ──
+  function toggleNotif() {
+    const panel = document.getElementById('notif-panel');
+    const overlay = document.getElementById('overlay');
+    panel.classList.toggle('open');
+    overlay.classList.toggle('show');
+  }
+
+  // ── Claim food ──
+  function claimFood(btn) {
+    btn.textContent = '✓ Claimed';
+    btn.classList.add('claimed');
+    btn.disabled = true;
+    showToast('🎉 Food claimed! Pick up within the time window.');
+  }
+
+  // ── Toast ──
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  // ── Emoji picker ──
+  function selectEmoji(btn) {
+    document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // ── Urgency ──
+  function selectUrgency(btn) {
+    document.querySelectorAll('.urgency-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // ── Submit donation ──
+  function submitDonation() {
+    showToast('🌱 Food posted successfully! Thank you!');
+    setTimeout(() => switchAppTab('home', document.querySelector('.nav-item')), 1000);
+  }
+
+  // ── Filter chips ──
+  function filterChip(chip) {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+  }
+</script>
+</body>
+</html>
